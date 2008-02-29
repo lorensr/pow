@@ -1,0 +1,171 @@
+h1. Pow &#x2192; 'Path Manipulation'
+
+
+h2. What
+
+
+h2. Installing
+
+<pre syntax="ruby">sudo gem install pow</pre>
+
+h2. The basics
+
+
+h2. Demonstration of usage
+
+Pow encapsulate the functionality of several ruby libraries (FileUtils, Files, Pathname and Dir) by creating objects out path strings. Here are some examples...
+
+<pre syntax="ruby">
+# The Simplest Example
+
+require 'rubygems'
+require 'pow'
+
+path = Pow["."] # Let's create a pow object in the current directory.
+</pre>
+
+Wow, amazing right? I guess not. But we'll get to the good stuff. Let's look at how pow deals with directories. Assume we are dealing with a directory structure like this
+
+<ul>
+  <li>/tmp</li>
+  <ul>
+    <li>README</li>
+    <li>/sub_dir</li>
+    <ul>
+      <li>/suber_dir</li>
+    </ul>
+    <li>file.txt</li>
+    <li>program</li>
+    <li>/extra_dir</li>
+  </ul>
+</ul>
+
+<pre syntax="ruby">
+# Open up the /tmp dir
+path = Pow["/tmp"]
+
+# Check out what's inside
+path.each {|child| puts "#{child} - #{child.class.name}" }
+</pre>
+
+*Output*
+
+<pre>
+/tmp/README - Pow::File
+/tmp/subdir - Pow::Directory
+/tmp/suber_dir - Pow::Directory
+/tmp/subdir/file.txt - Pow::File
+/tmp/subdir/program - Pow::File
+/tmp/extra_dir - Pow::Directory
+</pre>
+
+Cool, but what if I just want the directories or just the files
+
+<pre syntax="ruby">
+path.files.each {|file| "This is a file #{file}"}
+path.directories.each {|directory| "Here is a directory #{directory}"}
+</pre>
+
+When pow encounters a directory it creates a Pow::Directory object which is enumerable, so you can use all your favorite iterative methods on directory structures now.
+
+<pre syntax="ruby">
+path.find_all {|p| p.directory? and p.modified_at? > 1.day.ago}
+path.reject {|p| p.permissions == 744}
+path.collect {|p| p.size}
+</pre>
+
+You can also create directories and files
+
+<pre syntax="ruby">
+path["new_dir"].create
+</pre>
+
+puts
+puts : files? (if it has a '.' Pow considers it a file by default)"
+path["tmp/tmp.file"].create
+
+puts
+puts "What if my file doesn't have a dot?"
+path["tmp/also_a_file"].create_file # Just use create_file (and create_directory works as you would expect)
+
+puts
+puts "I want to shove some stuff into tmp.file"
+path["tmp/tmp.file"].open("w") do |file|
+  file.puts "Hey Baby!"
+end
+
+puts
+puts "I want get the stuff out of tmp.file"
+path["tmp/tmp.file"].open do |file|
+  puts file.read
+end
+
+puts
+puts "Let's get rid of the tmp dir and start over"
+begin
+  path.delete
+rescue PowError => e
+  puts "Oh no! It through an error because the tmp dir is not empty... we will have to force it."
+end
+path["tmp"].delete!
+puts "Does it still exist? #{path.exists?}"
+
+
+puts
+puts <<-STRING
+I want to create this dir structure
+
+tmp
+  empty_dir
+  sub_dir
+    info.txt
+  README
+STRING
+
+Pow["./tmp"].create do
+  Pow["empty_dir"].create
+  
+  Pow["sub_dir"].create do
+    Pow["info.txt"].create {|file| file.puts "Here is the info you desired!"}
+  end
+  
+  Pow["README"].create_file {|file| file.puts "I'm so glad you read this."}
+end
+
+puts "So what are the dirs in tmp"
+puts Pow["./tmp"].directories.join(", ")
+
+puts
+puts "What are the files in tmp"
+puts Pow["./tmp"].files.join(", ")
+
+puts
+puts "Is the empty dir empty? #{Pow['./tmp/empty_dir'].empty?}"
+
+puts
+puts "Is the there a super cool way to create a Pow object?"
+path = Pow[:tmp]/:sub_dir/:another_dir/:deeper_still/"a.file" # Which is a silly example, but it could come in handy
+
+path.create
+
+Pow["./tmp"].delete! # Clean up your mess
+
+
+h2. Forum
+
+"http://groups.google.com/group/pow":http://groups.google.com/group/pow
+
+h2. How to submit patches
+
+Read the "8 steps for fixing other people's code":http://drnicwilliams.com/2007/06/01/8-steps-for-fixing-other-peoples-code/ and for section "8b: Submit patch to Google Groups":http://drnicwilliams.com/2007/06/01/8-steps-for-fixing-other-peoples-code/#8b-google-groups, use the Google Group above.
+
+The trunk repository is <code>svn://rubyforge.org/var/svn/pow/trunk</code> for anonymous access.
+
+h2. License
+
+This code is free to use under the terms of the MIT license. 
+
+h2. Contact
+
+Comments are welcome. Send an email to "FIXME full name":mailto:FIXME email via the "forum":http://groups.google.com/group/pow
+

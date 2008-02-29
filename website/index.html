@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <link rel="stylesheet" href="stylesheets/screen.css" type="text/css" media="screen" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+      Pow &#x2192; &#8216;Path Manipulation&#8217;
+  </title>
+  <script src="javascripts/rounded_corners_lite.inc.js" type="text/javascript"></script>
+<style>
+
+</style>
+  <script type="text/javascript">
+    window.onload = function() {
+      settings = {
+          tl: { radius: 10 },
+          tr: { radius: 10 },
+          bl: { radius: 10 },
+          br: { radius: 10 },
+          antiAlias: true,
+          autoPad: true,
+          validTags: ["div"]
+      }
+      var versionBox = new curvyCorners(settings, document.getElementById("version"));
+      versionBox.applyCornersToAll();
+    }
+  </script>
+</head>
+<body>
+<div id="main">
+
+    <h1>Pow &#x2192; &#8216;Path Manipulation&#8217;</h1>
+    <div id="version" class="clickable" onclick='document.location = "http://rubyforge.org/projects/pow"; return false'>
+      <p>Get Version</p>
+      <a href="http://rubyforge.org/projects/pow" class="numbers">0.1.1</a>
+    </div>
+    <h2>What</h2>
+
+
+	<p>Pow encapsulate the functionality of several ruby libraries (FileUtils, Files, Pathname and Dir) by creating objects out path strings.</p>
+
+
+	<h2>Installing</h2>
+
+
+	<p><pre class='syntax'><span class="ident">sudo</span> <span class="ident">gem</span> <span class="ident">install</span> <span class="ident">pow</span></pre></p>
+
+
+	<h2>The basics</h2>
+
+
+	<p><pre class='syntax'>
+<span class="comment"># The Simplest Example</span>
+
+<span class="ident">require</span> <span class="punct">'</span><span class="string">rubygems</span><span class="punct">'</span>
+<span class="ident">require</span> <span class="punct">'</span><span class="string">pow</span><span class="punct">'</span>
+
+<span class="ident">path</span> <span class="punct">=</span> <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">.</span><span class="punct">&quot;]</span> <span class="comment"># Let's create a pow object in the current directory.</span>
+</pre></p>
+
+
+	<p>Wow, amazing right? I guess not. But we&#8217;ll get to the good stuff. Let&#8217;s look at how pow deals with directories. Assume we are dealing with a directory structure like this</p>
+
+
+	<h2>Demonstration of usage</h2>
+
+
+	<p>Consider this directory structure</p>
+
+
+<ul>
+  <li>/tmp</li>
+  <ul>
+    <li><span class="caps">README</span></li>
+    <li>/sub_dir</li>
+    <ul>
+      <li>/suber_dir</li>
+      <li>file.txt</li>
+      <li>program</li>      
+    </ul>
+    <li>/extra_dir</li>
+  </ul>
+</ul>
+
+	<p><pre class='syntax'>
+<span class="comment"># Open up the /tmp dir</span>
+<span class="ident">path</span> <span class="punct">=</span> <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">/tmp</span><span class="punct">&quot;]</span>
+
+<span class="comment"># Check out what's inside</span>
+<span class="ident">path</span><span class="punct">.</span><span class="ident">each</span> <span class="punct">{|</span><span class="ident">child</span><span class="punct">|</span> <span class="ident">puts</span> <span class="punct">&quot;</span><span class="string"><span class="expr">#{child}</span> - <span class="expr">#{child.class.name}</span></span><span class="punct">&quot;</span> <span class="punct">}</span>
+</pre></p>
+
+
+	<p><strong>Output</strong></p>
+
+
+<pre>
+/tmp/README - Pow::File
+/tmp/subdir - Pow::Directory
+/tmp/suber_dir - Pow::Directory
+/tmp/subdir/file.txt - Pow::File
+/tmp/subdir/program - Pow::File
+/tmp/extra_dir - Pow::Directory
+</pre>
+
+	<p>Cool, but what if I just want the directories or just the files</p>
+
+
+	<p><pre class='syntax'>
+<span class="ident">path</span><span class="punct">.</span><span class="ident">files</span><span class="punct">.</span><span class="ident">each</span> <span class="punct">{|</span><span class="ident">file</span><span class="punct">|</span> <span class="punct">&quot;</span><span class="string">This is a file <span class="expr">#{file}</span></span><span class="punct">&quot;}</span>
+<span class="ident">path</span><span class="punct">.</span><span class="ident">directories</span><span class="punct">.</span><span class="ident">each</span> <span class="punct">{|</span><span class="ident">directory</span><span class="punct">|</span> <span class="punct">&quot;</span><span class="string">Here is a directory <span class="expr">#{directory}</span></span><span class="punct">&quot;}</span>
+</pre></p>
+
+
+	<p>When pow encounters a directory it creates a Pow::Directory object. This is enumerable so you can use all your favorite iterative methods on directory structures now.</p>
+
+
+	<p><pre class='syntax'>
+<span class="ident">path</span><span class="punct">.</span><span class="ident">find_all</span> <span class="punct">{|</span><span class="ident">p</span><span class="punct">|</span> <span class="ident">p</span><span class="punct">.</span><span class="ident">directory?</span> <span class="keyword">and</span> <span class="ident">p</span><span class="punct">.</span><span class="ident">modified_at</span> <span class="punct">&gt;</span> <span class="number">1</span><span class="punct">.</span><span class="ident">day</span><span class="punct">.</span><span class="ident">ago</span><span class="punct">}</span>
+<span class="ident">path</span><span class="punct">.</span><span class="ident">reject</span> <span class="punct">{|</span><span class="ident">p</span><span class="punct">|</span> <span class="ident">p</span><span class="punct">.</span><span class="ident">permissions</span> <span class="punct">==</span> <span class="number">744</span><span class="punct">}</span>
+<span class="ident">path</span><span class="punct">.</span><span class="ident">collect</span> <span class="punct">{|</span><span class="ident">p</span><span class="punct">|</span> <span class="ident">p</span><span class="punct">.</span><span class="ident">size</span><span class="punct">}</span>
+</pre></p>
+
+
+	<p>You can also create directories and files</p>
+
+
+	<p><pre class='syntax'>
+<span class="ident">path</span><span class="punct">[&quot;</span><span class="string">new_dir</span><span class="punct">&quot;].</span><span class="ident">create</span> <span class="comment"># New dir</span>
+<span class="ident">path</span><span class="punct">[&quot;</span><span class="string">tmp/tmp.file</span><span class="punct">&quot;].</span><span class="ident">create</span> <span class="comment"># New file (if it has a '.' Pow considers it a file by default)&quot;</span>
+<span class="ident">path</span><span class="punct">[&quot;</span><span class="string">tmp/also_a_file</span><span class="punct">&quot;].</span><span class="ident">create_file</span> <span class="comment"># If you want to force file creation just use create_file (create_directory for the reverse)</span>
+</pre></p>
+
+
+	<p>You can read and write to files as well</p>
+
+
+	<p><pre class='syntax'>
+<span class="comment"># Shove some stuff into tmp.file</span>
+<span class="ident">path</span><span class="punct">[&quot;</span><span class="string">tmp/tmp.file</span><span class="punct">&quot;].</span><span class="ident">open</span><span class="punct">(&quot;</span><span class="string">w</span><span class="punct">&quot;)</span> <span class="keyword">do</span> <span class="punct">|</span><span class="ident">file</span><span class="punct">|</span>
+  <span class="ident">file</span><span class="punct">.</span><span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Hey Baby!</span><span class="punct">&quot;</span>
+<span class="keyword">end</span>
+
+<span class="comment"># Get the stuff out of tmp.file&quot;</span>
+<span class="ident">path</span><span class="punct">[&quot;</span><span class="string">tmp/tmp.file</span><span class="punct">&quot;].</span><span class="ident">open</span> <span class="keyword">do</span> <span class="punct">|</span><span class="ident">file</span><span class="punct">|</span>
+  <span class="ident">puts</span> <span class="ident">file</span><span class="punct">.</span><span class="ident">read</span>
+<span class="keyword">end</span>
+
+<span class="comment"># Alternatively</span>
+<span class="ident">path</span><span class="punct">[&quot;</span><span class="string">tmp/tmp.file</span><span class="punct">&quot;].</span><span class="ident">read</span>
+</pre></p>
+
+
+	<p>You can delete files and directories</p>
+
+
+	<p><pre class='syntax'>
+<span class="keyword">begin</span>
+  <span class="ident">path</span><span class="punct">.</span><span class="ident">delete</span>
+<span class="keyword">rescue</span> <span class="constant">PowError</span> <span class="punct">=&gt;</span> <span class="ident">e</span>
+  <span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Oh no! It threw an error because the tmp dir is not empty... we will have to force it.</span><span class="punct">&quot;</span>
+<span class="keyword">end</span>
+
+<span class="ident">path</span><span class="punct">[&quot;</span><span class="string">tmp</span><span class="punct">&quot;].</span><span class="ident">delete!</span>
+
+<span class="ident">path</span><span class="punct">.</span><span class="ident">exists?</span> <span class="comment"># =&gt; false</span>
+</pre></p>
+
+
+	<p>With Pow you can also create directory structures such as</p>
+
+
+<ul>
+  <li>/moar_tmp</li>
+  <ul>
+    <li>/empty_dir</li>
+    <li>/sub_dir</li>
+    <ul>
+      <li>info.txt</li>
+    </ul>
+    <li><span class="caps">README</span></li>
+  </ul>
+</ul>
+
+	<p><pre class='syntax'>
+<span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">./moar</span><span class="punct">&quot;].</span><span class="ident">create</span> <span class="keyword">do</span>
+  <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">empty_dir</span><span class="punct">&quot;].</span><span class="ident">create</span>
+  
+  <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">sub_dir</span><span class="punct">&quot;].</span><span class="ident">create</span> <span class="keyword">do</span>
+    <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">info.txt</span><span class="punct">&quot;].</span><span class="ident">create</span> <span class="punct">{|</span><span class="ident">file</span><span class="punct">|</span> <span class="ident">file</span><span class="punct">.</span><span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Here is the info you desired!</span><span class="punct">&quot;}</span>
+  <span class="keyword">end</span>
+  
+  <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">README</span><span class="punct">&quot;].</span><span class="ident">create_file</span> <span class="punct">{|</span><span class="ident">file</span><span class="punct">|</span> <span class="ident">file</span><span class="punct">.</span><span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">I'm so glad you read this.</span><span class="punct">&quot;}</span>
+<span class="keyword">end</span>
+
+<span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">So what are the dirs in tmp</span><span class="punct">&quot;</span>
+<span class="ident">puts</span> <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">./moar</span><span class="punct">&quot;].</span><span class="ident">directories</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(&quot;</span><span class="string">, </span><span class="punct">&quot;)</span>
+
+<span class="ident">puts</span>
+<span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">What are the files in tmp</span><span class="punct">&quot;</span>
+<span class="ident">puts</span> <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">./moar</span><span class="punct">&quot;].</span><span class="ident">files</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(&quot;</span><span class="string">, </span><span class="punct">&quot;)</span>
+
+<span class="ident">puts</span>
+<span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Is the empty dir empty? <span class="expr">#{Pow['./moar/empty_dir'].empty?}</span></span><span class="punct">&quot;</span>
+
+<span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">./moar</span><span class="punct">&quot;].</span><span class="ident">delete!</span> <span class="comment"># Clean up your mess</span>
+</pre></p>
+
+
+<strong>Output</strong>
+<pre>
+So what are the dirs in tmp
+/Users/corey/Code/pow/moar/empty_dir, /Users/corey/Code/pow/moar/sub_dir
+
+What are the files in tmp
+/Users/corey/Code/pow/moar/README
+
+Is the empty dir empty? true
+</pre>
+
+	<p>Is the there a super cool, but ultimately pointless way to create a Pow object?&#8221;</p>
+
+
+	<p><pre class='syntax'>
+<span class="ident">path</span> <span class="punct">=</span> <span class="constant">Pow</span><span class="punct">[&quot;</span><span class="string">.</span><span class="punct">&quot;]/</span><span class="symbol">:tmp</span><span class="punct">/</span><span class="symbol">:sub_dir</span><span class="punct">/</span><span class="symbol">:another_dir</span><span class="punct">/</span><span class="symbol">:deeper_still</span><span class="punct">/&quot;</span><span class="string">a.file</span><span class="punct">&quot;</span>
+<span class="ident">path</span><span class="punct">.</span><span class="ident">create</span>
+</pre></p>
+
+
+	<h2>Forum</h2>
+
+
+	<p><a href="http://rubyforge.org/forum/?group_id=4563">rubyforge forum</a></p>
+
+
+	<h2>How to submit patches</h2>
+
+
+	<p>Read the <a href="http://drnicwilliams.com/2007/06/01/8-steps-for-fixing-other-peoples-code/">8 steps for fixing other people&#8217;s code</a> and for section <a href="http://drnicwilliams.com/2007/06/01/8-steps-for-fixing-other-peoples-code/#8b-google-groups">8b: Submit patch to Google Groups</a>, use the Google Group above.</p>
+
+
+	<p>The trunk repository is <code>svn://rubyforge.org/var/svn/pow/trunk</code> for anonymous access.</p>
+
+
+	<h2>License</h2>
+
+
+	<p>This code is free to use under the terms of the <span class="caps">MIT</span> license.</p>
+
+
+	<h2>Contact</h2>
+
+
+	<p>All contact can be done through the rubyforge page <a href="http://rubyforge.org/projects/pow/">http://rubyforge.org/projects/pow/</a></p>
+    <p class="coda">
+      <a href="FIXME email">Corey Johnson</a>, 9th October 2007<br>
+      Theme extended from <a href="http://rb2js.rubyforge.org/">Paul Battley</a>
+    </p>
+</div>
+
+<!-- insert site tracking codes here, like Google Urchin -->
+
+</body>
+</html>
