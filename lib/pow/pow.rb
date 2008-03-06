@@ -13,11 +13,11 @@ class Pow
 
   def self.open(*paths, &block)
     paths.collect! {|path| path.to_s}
-    path = Pathname.new(::File.join(paths))
+    path = ::File.join(paths)) 
   
-    klass = if path.directory?
+    klass = if ::File.directory?(path)
       Directory
-    elsif path.file?
+    elsif ::File.file?(path)
       File
     else
       self
@@ -38,13 +38,12 @@ class Pow
   # = Instance Methods =
   # ====================
 
-  def initialize(path, mode="r+", &block)
-    self.path = Pathname.new(path).expand_path.cleanpath
-    open(mode, &block) if block_given?
+  def initialize(path, mode=nil, &block)
+    self.path = ::File.expand_path(path)
   end
 
   def to_s
-    path.to_s
+    path
   end
 
   def [](*paths)
@@ -52,11 +51,15 @@ class Pow
   end
 
   def /(name=nil)
-    Pow.open(path.to_s, name)
+    Pow.open(path, name)
   end
   
   def ==(other)
     other.to_s == self.to_s
+  end
+  
+  def eql?(other)
+    other.eql? self.to_s
   end
 
   def =~(other)
@@ -64,15 +67,16 @@ class Pow
   end
 
   def name
-    path.basename.to_s
+    ::File.basename path
   end
   
+  alias_method :exist? :exists?
   def exists?
-    path.exist? ? self : nil
+    ::File.exist? path
   end
   
   def parent
-    Pow[path.dirname]
+    Pow(::File(dirname))
   end
 
   def permissions=(mode)
@@ -100,7 +104,7 @@ class Pow
     path.mtime
   end
 
-  #If there is a . in the name, then I assume it is a file
+  #If there is a . in the name, then assume it is a file
   def create(&block)
     name =~ /\./ ? create_file(&block) : create_directory(&block)
   end
