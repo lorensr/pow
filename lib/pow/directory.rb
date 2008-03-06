@@ -1,6 +1,7 @@
 class Pow
   class Directory < Pow
     include Enumerable
+
   
     # ====================
     # = Instance Methods =
