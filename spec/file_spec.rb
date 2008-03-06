@@ -7,7 +7,7 @@ require 'spec'
 
 require File.dirname(__FILE__) + '/../lib/pow'
 
-context "A File object" do
+context Pow::File do
   setup do
     @dir_pathname = "./test_dir"
     @filename = "file.txt"  

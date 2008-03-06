@@ -1,5 +1,5 @@
-class Pow
-  class File < Pow
+module Pow
+  class File < Base
     
     # ====================
     # = Instance Methods =
@@ -33,14 +33,15 @@ class Pow
       ::File.size(path) == 0
     end
     
-    alias_method(:cp, :copy_to)
     def copy_to(dest)
       FileUtils.cp(path.to_s, dest.to_s)
     end
+    alias_method :cp, :copy_to
     
-    alias_method(:mv, :move_to)
     def move_to(dest)
       FileUtils.mv(path.to_s, dest.to_s)
     end
+    alias_method :mv, :move_to
+    
   end
 end

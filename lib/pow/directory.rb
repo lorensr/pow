@@ -1,5 +1,5 @@
-class Pow
-  class Directory < Pow
+module Pow
+  class Directory < Base
     include Enumerable
 
   
@@ -36,15 +36,15 @@ class Pow
       FileUtils.rmtree path
     end
     
-    alias_method :cp, :copy_to
     def copy_to(dest)
       FileUtils.cp_r(path, dest.to_s)
     end
+    alias_method :cp, :copy_to
     
-    alias_method :mv, :move_to
     def move_to(dest)
       FileUtils.mv(path, dest.to_s)
     end
+    alias_method :mv, :move_to
   
     def empty?
       children.empty?

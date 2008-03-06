@@ -1,4 +1,4 @@
-class Pow #:nodoc:
+module Pow #:nodoc:
   module VERSION #:nodoc:
     MAJOR = 0
     MINOR = 2
