@@ -8,10 +8,6 @@ module Pow
   class Base
     attr_accessor :path
 
-    # =================
-    # = Class Methods =
-    # =================
-
     def self.open(*paths, &block)
       paths.collect! {|path| path.to_s}
       path = ::File.join(paths)
@@ -26,14 +22,12 @@ module Pow
   
       klass.new(path, &block)
     end
-  
+    
+    # Returns the path to the current working directory as a Pow::Dir object.
     def self.working_directory
-      Dir.getwd
+      Pow(Dir.getwd)
     end
-
-    # ====================
-    # = Instance Methods =
-    # ====================
+    class <<self; alias_method :cwd, :working_directory; end
 
     def initialize(path, mode=nil, &block)
       self.path = ::File.expand_path(path)
@@ -43,14 +37,21 @@ module Pow
       raise PowError, "Path (#{path}) does not exist."
     end
 
+    # String representation of the expanded path
     def to_s
       path
     end
-
-    def [](*paths)
-      Pow(path, *paths)
+    
+    # Shortcut to combine paths
+    #   path = Pow("tmp")
+    #   readme_path = path[:README]
+    def [](*paths, &block)
+      Pow(path, *paths, &block)
     end
 
+    # Shortcut to append info onto a Pow object
+    #   path = Pow("tmp")
+    #   readme_path = path/"subdir"/"README"
     def /(name=nil)
       self.class.open(path, name)
     end
@@ -63,8 +64,12 @@ module Pow
       other.eql? self.to_s
     end
 
-    def =~(other)
-      name =~ other
+    # Regex match on the basename for the path
+    # path = Pow("/tmp/a_file.txt")
+    # path =~ /file/ #=> 2
+    # path =~ /tmp/ #=> nil
+    def =~(pattern)
+      name =~ pattern
     end
 
     def name

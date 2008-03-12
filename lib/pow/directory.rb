@@ -64,6 +64,7 @@ module Pow
     def directories
       children(:include_files => true)
     end
+    alias_method :dirs, :directories
   
     def children(options={})
       options = {:include_dirs => true, :include_files => true}.merge(options)

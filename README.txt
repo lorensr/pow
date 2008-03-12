@@ -7,38 +7,60 @@ Pow
 You can manipulating files and directories in Ruby, but it's not fun -- it's missing POW!
 Pow treats files and directories as ruby objects giving you more power and flexibility.
 
-But why do I need Pow when ruby has File, FileUtils, Find, FileTest, Pathname... Because Pow combines the power of those libraries into a more ruby-like interface. 
+Why not use File, FileUtils, Find, FileTest, Pathname... Because Pow combines the power of those libraries into a one rubyish interface. 
 
-== Usage
+== Basic Usage
 
 Consider this directory structure
 
   /tmp
     README
     /sub_dir
-      file.txt
-      program  
       /deeper_dir
-      /extra_dir
+      file.txt
+      program
+    /extra_dir
 
-*Directory*:
+Open a directory
   path = Pow("tmp")
 
-*Check out what's inside a directory*::
+Check out what's inside a directory
   path = Pow("tmp")
-  path.each {|child| puts "#{child} - #{child.class.name}" }
+  path.each {|child| puts "#{child} - #{child.class.name}!" }
 
-  \_Output_
-
-  <tt>
+  # Output!
+  # -------
   /tmp/README - Pow::File
   /tmp/subdir - Pow::Directory
-  /tmp/suber_dir - Pow::Directory
-  /tmp/subdir/file.txt - Pow::File
-  /tmp/subdir/program - Pow::File
+  /tmp/sub_dir/deeper_dir - Pow::Directory
+  /tmp/sub_dir/file.txt - Pow::File
+  /tmp/sub_dir/program - Pow::File
   /tmp/extra_dir - Pow::Directory
-  </tt>
   
+Create nested directories
+  Pow("moar").create do
+    Pow("sub_dir").create
+      Pow("info.txt").create {|file| file.puts "Here is the info you desired!"}
+    end
+
+    Pow("README").create_file {|file| file.puts "I'm so glad you read this."}
+  end
+  
+  # Creates directory structure
+  /moar
+    /sub_dir
+      info.txt
+    README
+  
+Open a file
+  Pow(:tmp, :sub_dir, :file.txt) do |file|
+    # All the stuff you usually do with an open file!
+  end
+
+Create a file
+  Pow(:tmp, :sub_dir, :new_file.txt).create do |file|
+    # All the stuff you usually do with an new file!
+  end
 
 == Installation:
   
