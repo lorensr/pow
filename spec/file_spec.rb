@@ -7,46 +7,60 @@ require 'spec'
 
 require File.dirname(__FILE__) + '/../lib/pow'
 
-context Pow::File do
+describe Pow::File do
   setup do
     @dir_pathname = "./test_dir"
     @filename = "file.txt"  
     FileUtils.mkpath @dir_pathname
     open("#{@dir_pathname}/#{@filename}", "w+") {|f| f.write "hello"}
     
-    @dir = Pow.open(@dir_pathname)
-    @file = Pow.open("#{@dir_pathname}/#{@filename}")
+    @dir = Pow(@dir_pathname)
+    @file = Pow("#{@dir_pathname}/#{@filename}")
+    
+    ::File.stub!(:delete).and_return(true)
   end 
   
   teardown do
     FileUtils.rm_r @dir_pathname
   end
 
-  specify "should have a correct name." do    
+  it "has correct name" do    
     @file.name.should == "file.txt"
   end
 
-  specify "should have a correct extension." do    
+  it "matches regular expression for extention" do    
+    @file.name.should =~ /txt/
+  end
+
+  it "matches regular expression for basename" do    
+    @file.name.should =~ /file/
+  end
+
+  it "has correct extension" do    
     @file.extention.should == "txt"
   end
 
-  specify "should have an empty extention if there is none." do    
+  it "returns nil if there is no extension" do
     open("#{@dir_pathname}/README", "w+") {|f| f.write "readme"}
-    extensionless_file = Pow.open("#{@dir_pathname}/README")
+    extensionless_file = Pow("#{@dir_pathname}/README")
     
-    extensionless_file.extention.should == ""
+    extensionless_file.extention.should == nil
   end
 
-  specify "should know it exists." do    
+  it "is aware of its existence" do    
     @file.exists?.should be_true
   end
   
-  specify "should remove itself." do    
+  it "is aware of its inexistence" do    
+    Pow(@dir, :this, :is, :a, :fake, :file).exists?.should be_false
+  end
+  
+  it "should remove itself" do
     @file.delete
-    @file.should_not be_exist
+    ::File.should_receive(:delete).with(@file.path)
   end
     
-  specify "should be able to set the permissions." do    
+  it "should be able to set the permissions" do    
     @file.permissions = 555
     File.should_not be_writable(@file.to_s)
 
@@ -54,7 +68,7 @@ context Pow::File do
     File.should be_writable(@file.to_s)
   end
   
-  specify "should be able to read the permissions." do    
+  it "should be able to read the permissions" do    
     FileUtils.chmod(0555, @file.path.to_s)
     @file.permissions.should == 555
 
@@ -62,13 +76,13 @@ context Pow::File do
     @file.permissions.should == 777
   end
   
-  specify "should be openable!" do    
+  it "should be openable!" do    
     @file.open do |file|
       file.read.should == "hello"
     end
   end
   
-  specify "should be copyable" do    
+  it "should be copyable" do    
     copy_path = "./test_dir/file_copy.txt"
     @file.copy_to(copy_path)
     
@@ -76,7 +90,7 @@ context Pow::File do
     Pow[copy_path].should be_kind_of(Pow::File)
   end
   
-  specify "should be moveable" do    
+  it "should be moveable" do    
     move_path = "./test_dir/file_move.txt"
     @file.move_to(move_path)
     
@@ -85,7 +99,7 @@ context Pow::File do
     Pow[move_path].should be_kind_of(Pow::File)
   end
   
-  specify "should have a parent dir" do    
+  it "should have a parent dir" do    
     @file.parent.should == @dir
   end
 end
