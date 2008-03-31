@@ -71,12 +71,14 @@ module Pow
 
       children = []
       Dir.foreach(path) do |child|
-        next if e == '.'
-        next if e == '..'
+        next if child == '.'
+        next if child == '..'
         next if (::File.file?(child) and not options[:include_files]) 
         next if (::File.directory? and not options[:include_dirs])
         children << Pow.open(path, child) 
       end
+      
+      children
     end
   
     def each(&block)
