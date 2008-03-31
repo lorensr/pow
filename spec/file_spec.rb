@@ -7,85 +7,107 @@ require 'spec'
 
 require File.dirname(__FILE__) + '/../lib/pow'
 
-context Pow::File do
+describe Pow::File do
   setup do
     @dir_pathname = "./test_dir"
     @filename = "file.txt"  
     FileUtils.mkpath @dir_pathname
     open("#{@dir_pathname}/#{@filename}", "w+") {|f| f.write "hello"}
     
-    @dir = Pow.open(@dir_pathname)
-    @file = Pow.open("#{@dir_pathname}/#{@filename}")
+    @dir = Pow(@dir_pathname)
+    @file = Pow("#{@dir_pathname}/#{@filename}")
   end 
   
   teardown do
     FileUtils.rm_r @dir_pathname
   end
 
-  specify "should have a correct name." do    
+  it "has correct name" do    
     @file.name.should == "file.txt"
   end
 
-  specify "should have a correct extension." do    
+  it "matches regular expression for extention" do    
+    @file.name.should =~ /txt/
+  end
+
+  it "matches regular expression for basename" do    
+    @file.name.should =~ /file/
+  end
+
+  it "has correct extension" do    
     @file.extention.should == "txt"
   end
 
-  specify "should have an empty extention if there is none." do    
+  it "returns nil if there is no extension" do
     open("#{@dir_pathname}/README", "w+") {|f| f.write "readme"}
-    extensionless_file = Pow.open("#{@dir_pathname}/README")
+    extensionless_file = Pow("#{@dir_pathname}/README")
     
-    extensionless_file.extention.should == ""
+    extensionless_file.extention.should == nil
   end
 
-  specify "should know it exists." do    
+  it "is aware of its existence" do    
     @file.exists?.should be_true
   end
   
-  specify "should remove itself." do    
+  it "is aware of its inexistence" do    
+    Pow(@dir, :this, :is, :a, :fake, :file).exists?.should be_false
+  end
+
+  it "knows when it is not empty" do    
+    @file.empty?.should be_false
+  end
+  
+  it "knows when it is empty" do    
+    empty_file = Pow("#{@dir_pathname}/empty.txt")
+    open(empty_file.path, "w+") {|f| f.write ""}
+    empty_file.empty?.should be_true
+  end
+  
+  it "deletes itself" do
+    ::File.should_receive(:delete).with(@file.path)
     @file.delete
-    @file.should_not be_exist
   end
     
-  specify "should be able to set the permissions." do    
-    @file.permissions = 555
+  it "can set its permissions" do    
+    @file.permissions = 515
     File.should_not be_writable(@file.to_s)
 
     @file.permissions = 777
     File.should be_writable(@file.to_s)
   end
   
-  specify "should be able to read the permissions." do    
-    FileUtils.chmod(0555, @file.path.to_s)
-    @file.permissions.should == 555
+  it "can read the permissions" do    
+    FileUtils.chmod(0514, @file.path.to_s)
+    @file.permissions.should == 514
 
-    FileUtils.chmod(0777, @file.path.to_s)
-    @file.permissions.should == 777
+    FileUtils.chmod(0731, @file.path.to_s)
+    @file.permissions.should == 731
   end
   
-  specify "should be openable!" do    
+  it "can be read" do    
     @file.open do |file|
       file.read.should == "hello"
     end
   end
   
-  specify "should be copyable" do    
-    copy_path = "./test_dir/file_copy.txt"
+  it "can be copied" do    
+    copy_path = @file.path + ".copy"
     @file.copy_to(copy_path)
     
     File.exists?(copy_path).should be_true
-    Pow[copy_path].should be_kind_of(Pow::File)
+    Pow(copy_path).should be_kind_of(Pow::File)
   end
   
-  specify "should be moveable" do    
-    move_path = "./test_dir/file_move.txt"
+  it "can be moved" do    
+    move_path = @file.path + ".move"
     @file.move_to(move_path)
     
     File.exists?(move_path).should be_true
     File.exists?(@file.to_s).should_not be_true
-    Pow[move_path].should be_kind_of(Pow::File)
+    Pow(move_path).should be_kind_of(Pow::File)
   end
   
-  specify "should have a parent dir" do    
+  it "has a parent dir" do    
     @file.parent.should == @dir
   end
 end

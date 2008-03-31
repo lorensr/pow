@@ -87,7 +87,7 @@ module Pow
 
     def permissions=(mode)
       mode = mode.to_s.to_i(8) # convert from octal
-      path.chmod(mode)
+      FileUtils.chmod(mode, path)
     end
 
     def permissions

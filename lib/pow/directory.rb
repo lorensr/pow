@@ -72,6 +72,7 @@ module Pow
       children = []
       Dir.foreach(path) do |child|
         child_path = ::File.join(path, child)
+
         next if child == '.'
         next if child == '..'
         next if (::File.file?(child_path) and not options[:include_files]) 
