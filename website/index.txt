@@ -3,7 +3,7 @@ h1. Pow &#x2192; 'Path Manipulation'
 
 h2. What
 
-Pow encapsulate the functionality of several ruby libraries (FileUtils, Files, Pathname and Dir) by creating objects out path strings.
+Pow encapsulates the functionality of several ruby libraries (FileUtils, Files, Pathname and Dir) by creating objects out path strings.
 
 h2. Installing
 
@@ -59,7 +59,7 @@ path.each {|child| puts "#{child} - #{child.class.name}" }
 /tmp/extra_dir - Pow::Directory
 </pre>
 
-Cool, but what if I just want the directories or just the files
+Cool, but what if I just want the directories or just the files?
 
 <pre syntax="ruby">
 path.files.each {|file| "This is a file #{file}"}
@@ -163,7 +163,7 @@ What are the files in tmp
 Is the empty dir empty? true
 </pre>
 
-Is the there a super cool, but ultimately pointless way to create a Pow object?"
+Is there a super cool, but ultimately pointless way to create a Pow object?
 
 <pre syntax="ruby">
 path = Pow["."]/:tmp/:sub_dir/:another_dir/:deeper_still/"a.file"
