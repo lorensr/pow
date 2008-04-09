@@ -4,6 +4,15 @@ def Pow(*args, &block)
   Pow::Base.open(*args, &block)
 end
 
+def Pow!(*args, &block)
+  file_path = File::expand_path(::File.dirname(caller[0]))
+  Pow(file_path, *args, &block)
+end
+
+def fart
+  go
+end
+
 module Pow
   class Base
     attr_accessor :path
