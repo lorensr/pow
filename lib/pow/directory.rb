@@ -33,7 +33,7 @@ module Pow
     end
     
     def delete!
-      FileUtils.rmtree path
+      FileUtils.rm_r path
     end
     
     def copy_to(dest)
@@ -54,20 +54,20 @@ module Pow
     # = My Children =
     # ===============
     def glob(pattern, *flags)
-      Dir[::File.join(to_s, pattern), *flags].collect {|path| Pow.open(path)}
+      Dir[::File.join(to_s, pattern), *flags].collect {|path| Pow(path)}
     end
     
     def files
-      children(:include_dirs => true)
+      children(:no_dirs => true)
     end
 
     def directories
-      children(:include_files => true)
+      children(:no_files => true)
     end
     alias_method :dirs, :directories
   
     def children(options={})
-      options = {:include_dirs => true, :include_files => true}.merge(options)
+      options = {:no_dirs => false, :no_files => false}.merge(options)
 
       children = []
       Dir.foreach(path) do |child|
@@ -75,8 +75,8 @@ module Pow
 
         next if child == '.'
         next if child == '..'
-        next if (::File.file?(child_path) and not options[:include_files]) 
-        next if (::File.directory?(child_path) and not options[:include_dirs])
+        next if (::File.file?(child_path) and options[:no_files]) 
+        next if (::File.directory?(child_path) and options[:no_dirs])
         children << Pow(child_path) 
       end
       

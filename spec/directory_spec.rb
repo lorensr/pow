@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'rubygems'
 require 'spec'
 
-require 'pathname'
+require 'fileutils'
 
 require File.dirname(__FILE__) + '/../lib/pow'
 
@@ -16,7 +16,7 @@ describe "A Directory object" do
   end 
   
   teardown do
-    #FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
+    FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
 
   it "has valid name" do    
@@ -27,52 +27,54 @@ describe "A Directory object" do
     @sub_dir.exists?.should be_true
   end
   
-  it "removes itself" do    
-    ::Dir.should_receive(:rmdir).with(@sub_dir.path)
+  it "removes itself" do
     @sub_dir.delete
+    File.should_not be_exist(@sub_dir.path) 
   end
   
-  it "removes all subdirectories." do
-    ::FileUtils.should_receive(:rmtree).with(@dir.path)
+  it "removes all subdirectories" do
     @dir.delete!
+    File.should_not be_exist(@sub_dir.path)
+    File.should_not be_exist(@dir.path)
   end
   
-  it "raises an error if directory tries to delete itself but is not empty." do    
+  it "raises an error if directory tries to delete itself but is not empty" do    
     lambda {@dir.delete}.should raise_error(PowError)
-    ::File.should be_exist(@sub_dir)
+    File.should be_exist(@sub_dir.path)
+    File.should be_exist(@dir.path)
   end
   
-  it "should be able to set the permissions." do    
-    @dir.permissions = 555
-    File.should_not be_writable(@dir.to_s)
+  it "sets permissions" do    
+    @dir.permissions = 333
+    File.should_not be_readable(@dir.to_s)
 
     @dir.permissions = 777
-    File.should be_writable(@dir.to_s)
+    File.should be_readable(@dir.to_s)
   end
   
-  it "should be able to read the permissions." do    
-    FileUtils.chmod(555, @dir.path.to_s)
-    @dir.permissions.should == 555
+  it "read permissions" do    
+    FileUtils.chmod(0755, @dir.path.to_s)
+    @dir.permissions.should == 755
 
-    FileUtils.chmod(777, @dir.path.to_s)
-    @dir.permissions.should == 777
+    FileUtils.chmod(0717, @dir.path.to_s)
+    @dir.permissions.should == 717
   end
   
-  it "should be copyable" do    
+  it "is copyable" do    
     copy_path = "./test_dir/sub_dir_copy"
     @sub_dir.copy_to(copy_path)
     
-    File.exists?(copy_path)
-    Pow[copy_path].should be_kind_of(Pow::Directory)
+    File.should be_exists(copy_path)
+    Pow(copy_path).should be_kind_of(Pow::Directory)
   end
   
-  it "should be moveable" do    
+  it "is moveable" do    
     move_path = "./test_dir/moved_sub_dir"
     @sub_dir.move_to(move_path)
     
-    File.exists?(move_path).should be_true
-    File.exists?(@sub_dir.to_s).should_not be_true
-    Pow[move_path].should be_kind_of(Pow::Directory)
+    File.should be_exists(move_path)
+    File.should_not be_exists(@sub_dir.to_s)
+    Pow(move_path).should be_kind_of(Pow::Directory)
   end
   
   it "should have a parent dir" do    
@@ -88,30 +90,30 @@ describe "The children of a Directory" do
     open("./earth/evolution", "w+")
     open("./earth/history.txt", "w+")
     
-    @dir = Pow.open("./earth/")
+    @dir = Pow("./earth/")
   end
   
   teardown do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
   
-  it "should include all files and directories." do
+  it "includes all files and directories" do
     @dir.should have(5).children
     @dir.children.each { |child| [Pow::File, Pow::Directory].should be_member(child.class) }
   end
   
-  it "should allow you to select files." do
-    @dir.should have(2).children(true, false)
-    @dir.children(true, false).should == @dir.files
+  it "allow you to select files" do
+    @dir.should have(2).children(:no_dirs => true)
+    @dir.children(:no_dirs => true).should == @dir.files
     
     @dir.files.each { |file| file.should be_kind_of(Pow::File) }
     @dir.files.collect {|file| file.name}.should be_member("evolution")
     @dir.files.collect {|file| file.name}.should be_member("history.txt")
   end
 
-  it "should allow you to select directories." do
-    @dir.should have(3).children(false, true)
-    @dir.children(false, true).should == @dir.directories
+  it "should allow you to select directories" do
+    @dir.should have(3).children(:no_files => true)
+    @dir.children(:no_files => true).should == @dir.directories
     
     @dir.directories.each { |directory| directory.should be_kind_of(Pow::Directory) }
     
@@ -120,7 +122,7 @@ describe "The children of a Directory" do
     @dir.directories.collect {|directory| directory.name}.should be_member("things")
   end
   
-  it "should be accessable via glob." do
+  it "should be accessable via glob" do
     @dir.glob("*").size.should == 5
     @dir.glob("*").each { |child| [Pow::File, Pow::Directory].should be_member(child.class) }
     @dir.glob("*").collect {|path| path.name}.should be_member("history.txt")
@@ -131,68 +133,54 @@ describe "The children of a Directory" do
   end
 end
   
-describe "Then enumerable bits of a Directory" do
-  it "should include enumerable." do
-    Pow::Directory.ancestors.should be_member(Enumerable)
-  end
-  
-  it "should call every child when each is called." do
-    dir = Pow::Directory[("./test_dir")].create
-    
-    child_one = mock("child_one")
-    child_two = mock("child_two")
-    dir.stub!(:children).and_return([child_one,child_two])
-    
-    child_one.should_receive(:yes)
-    child_two.should_receive(:yes)
-
-    dir.each do |child|
-      child.yes
-    end
-  end
-end
-
-describe "Nested directory objects" do
+describe "Enumerable parts of Directory" do
   setup do
     FileUtils.mkpath "./test_dir/sub_dir"
-    @dir = Pow::Directory["./test_dir"]
-    @sub_dir = Pow::Directory.open("./test_dir/sub_dir")
-  end
+    
+    @dir = Pow("./test_dir")
+    @sub_dir = @dir/"sub_dir"
+  end 
   
   teardown do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
   
-  it "should be accessible when joined" do
-   path = Pow::Directory["test_dir", "sub_dir"]
-   path.exists?.should be_true
-   path.should be_instance_of(Pow::Directory)
+  
+  it "is enumerable, duh" do
+    Pow::Directory.ancestors.should be_member(Enumerable)
   end
   
-  it "should be accessible from path object" do
-   path = @dir["sub_dir"]
-   path.exists?.should be_true
-   path.should be_instance_of(Pow::Directory)
+  it "calls every child when 'each' is called" do
+    child_one = mock("child_one")
+    child_two = mock("child_two")
+    @dir.stub!(:children).and_return([child_one,child_two])
+    
+    child_one.should_receive(:yes)
+    child_two.should_receive(:yes)
+
+    @dir.each do |child|
+      child.yes
+    end
   end
 end
 
 describe "Using blocks to create Directory structure" do
   setup do
     FileUtils.mkpath "./test_dir/"
-    @dir = Pow.open("./test_dir")
+    @dir = Pow("./test_dir")
   end
   
   teardown do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
   
-  it "should change the working directory" do
+  it "changes the working directory" do
     @dir.open do |path|
       Dir.pwd.should == path.to_s
     end
   end
   
-  it "should go back to old dir if block raises error" do
+  it "goes back to old dir if block raises error" do
     current_dir = Dir.pwd
     
     begin
@@ -205,13 +193,13 @@ describe "Using blocks to create Directory structure" do
     Dir.pwd.should == current_dir
   end
   
-  it "should create sub directories when within a block" do
+  it "creates sub directories when within a block" do
     @dir["sub_dir"].create do
-      Pow["sub_sub_dir"].create
+      Pow("sub_sub_dir").create
     end
     
-    sub_dir = Pow["./test_dir/sub_dir"]
-    sub_sub_dir = Pow["./test_dir/sub_dir/sub_sub_dir"]
+    sub_dir = Pow("./test_dir/sub_dir")
+    sub_sub_dir = Pow("./test_dir/sub_dir/sub_sub_dir")
 
     sub_dir.should be_kind_of(Pow::Directory)
     sub_dir.exists?.should be_true
