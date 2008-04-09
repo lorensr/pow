@@ -16,7 +16,7 @@ describe "A Directory object" do
   end 
   
   teardown do
-    FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
+    #FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
 
   it "has valid name" do    
@@ -32,17 +32,14 @@ describe "A Directory object" do
     @sub_dir.delete
   end
   
-  it "should remove all subdirectories." do
+  it "removes all subdirectories." do
+    ::FileUtils.should_receive(:rmtree).with(@dir.path)
     @dir.delete!
-    @dir.should_not be_exist
-    @sub_dir.should_not be_exist
   end
   
-  it "should an raise error if it tries to delete itself but is not empty." do    
+  it "raises an error if directory tries to delete itself but is not empty." do    
     lambda {@dir.delete}.should raise_error(PowError)
-
-    @dir.should be_exist
-    @sub_dir.should be_exist    
+    ::File.should be_exist(@sub_dir)
   end
   
   it "should be able to set the permissions." do    
