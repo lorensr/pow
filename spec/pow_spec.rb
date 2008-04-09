@@ -85,16 +85,16 @@ describe Pow::Base, "object equality" do
   end
 end
 
-describe Pow::Base, "non-existing paths" do
+describe Pow::Base, "nonexistent paths" do
   setup do
     @pow = Pow::Base.open("./blah/blah/blah/blah")
   end 
   
-  it "should know it doesn't exists" do    
+  it "should know it doesn't exist" do
     @pow.exists?.should be_false
   end
   
-  it "can't be open" do    
+  it "can't be opened" do
     lambda {@pow.open}.should raise_error(PowError)
   end
 end

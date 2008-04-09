@@ -4,10 +4,10 @@ Pow
 
 == Description:
 
-You can manipulating files and directories in Ruby, but it's not fun -- it's missing POW!
+You can manipulate files and directories in Ruby, but it's not fun -- it's missing POW!
 Pow treats files and directories as ruby objects giving you more power and flexibility.
 
-Why not use File, FileUtils, Find, FileTest, Pathname... Because Pow combines the power of those libraries into a one rubyish interface. 
+Why not use File, FileUtils, Find, FileTest, Pathname, ...? Because Pow combines the power of those libraries into one rubyish interface. 
 
 == Basic Usage
 
