@@ -39,7 +39,9 @@ module Pow
     alias_method :cp, :copy_to
     
     def move_to(dest)
-      FileUtils.mv(path.to_s, dest.to_s)
+      if FileUtils.mv(path.to_s, dest.to_s)
+        self.path = dest
+      end
     end
     alias_method :mv, :move_to
     

@@ -98,14 +98,17 @@ describe Pow::File do
     Pow(copy_path).should be_kind_of(Pow::File)
   end
   
-  it "can be moved" do    
+  it "can be moved." do    
     move_path = @file.path + ".move"
+    old_path = @file.path
     @file.move_to(move_path)
     
     File.exists?(move_path).should be_true
-    File.exists?(@file.to_s).should_not be_true
+    File.exists?(old_path).should_not be_true
     Pow(move_path).should be_kind_of(Pow::File)
+    @file.path.should == move_path
   end
+
   
   it "has a parent dir" do    
     @file.parent.should == @dir

@@ -5,12 +5,8 @@ def Pow(*args, &block)
 end
 
 def Pow!(*args, &block)
-  file_path = File::expand_path(::File.dirname(caller[0]))
+  file_path = ::File.dirname(caller[0])
   Pow(file_path, *args, &block)
-end
-
-def fart
-  go
 end
 
 module Pow
@@ -43,9 +39,40 @@ module Pow
     end
 
     def open(mode=nil, &block)
-      raise PowError, "Path (#{path}) does not exist."
+      path_must_exist
+    end
+    
+    def copy_to(dest)
+      path_must_exist
+    end
+    alias_method :cp, :copy_to
+    
+    def move_to(dest)
+      path_must_exist
+    end
+    alias_method :mv, :move_to
+    
+    def permissions=(mode)
+      mode = mode.to_s.to_i(8) # convert from octal
+      FileUtils.chmod(mode, path)
     end
 
+    def permissions
+      ("%o" % ::File.stat(path.to_s).mode)[2..-1].to_i # Forget about the first two numbers
+    end
+
+    def accessed_at
+      path.atime
+    end
+
+    def changed_at
+      path.ctime
+    end
+
+    def modified_at
+      path.mtime
+    end
+    
     # String representation of the expanded path
     def to_s
       path
@@ -94,29 +121,8 @@ module Pow
       Pow(::File.dirname(path))
     end
 
-    def permissions=(mode)
-      mode = mode.to_s.to_i(8) # convert from octal
-      FileUtils.chmod(mode, path)
-    end
-
-    def permissions
-      ("%o" % ::File.stat(path.to_s).mode)[2..-1].to_i # Forget about the first two numbers
-    end
-
     def empty?
       true
-    end
-
-    def accessed_at
-      path.atime
-    end
-
-    def changed_at
-      path.ctime
-    end
-
-    def modified_at
-      path.mtime
     end
 
     #If there is a . in the name, then assume it is a file
@@ -139,6 +145,15 @@ module Pow
       dir.open(&block) if block_given?
     
       dir
+    end
+    
+    private
+    def path_must_exist
+      raise PowError, "Path (#{path}) does not exist."
+    end
+    
+    def path=(value)
+      @path = ::File::expand_path(value)
     end
   end
 end

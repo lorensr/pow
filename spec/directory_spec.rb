@@ -68,15 +68,17 @@ describe "A Directory object" do
     Pow(copy_path).should be_kind_of(Pow::Directory)
   end
   
-  it "is moveable" do    
-    move_path = "./test_dir/moved_sub_dir"
+  it "can be moved." do    
+    move_path = @sub_dir.parent.path + "/moved_sub_dir"
+    old_path = @sub_dir.path
     @sub_dir.move_to(move_path)
     
-    File.should be_exists(move_path)
-    File.should_not be_exists(@sub_dir.to_s)
+    File.exists?(move_path).should be_true
+    File.exists?(old_path).should_not be_true
     Pow(move_path).should be_kind_of(Pow::Directory)
+    @sub_dir.path.should == move_path
   end
-  
+    
   it "should have a parent dir" do    
     @sub_dir.parent.should == @dir
   end
