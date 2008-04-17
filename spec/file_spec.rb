@@ -25,6 +25,14 @@ describe Pow::File do
   it "has correct name" do    
     @file.name.should == "file.txt"
   end
+  
+  it "gets name without extention" do    
+    @file.name(false).should == "file"
+  end
+
+  it "gets name without extention, even when there is no extention" do    
+    Pow("./this/word").name(false).should == "word"
+  end  
 
   it "matches regular expression for extention" do    
     @file.name.should =~ /txt/
@@ -108,7 +116,6 @@ describe Pow::File do
     Pow(move_path).should be_kind_of(Pow::File)
     @file.path.should == move_path
   end
-
   
   it "has a parent dir" do    
     @file.parent.should == @dir

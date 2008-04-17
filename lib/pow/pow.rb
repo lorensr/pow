@@ -51,7 +51,7 @@ module Pow
       path_must_exist
     end
     alias_method :mv, :move_to
-    
+        
     def permissions=(mode)
       mode = mode.to_s.to_i(8) # convert from octal
       FileUtils.chmod(mode, path)
@@ -59,6 +59,10 @@ module Pow
 
     def permissions
       ("%o" % ::File.stat(path.to_s).mode)[2..-1].to_i # Forget about the first two numbers
+    end
+    
+    def size
+      ::File.size(path)
     end
 
     def accessed_at
@@ -77,6 +81,7 @@ module Pow
     def to_s
       path
     end
+    alias_method :to_str, :to_s
     
     # Shortcut to combine paths
     #   path = Pow("tmp")
@@ -108,9 +113,14 @@ module Pow
       name =~ pattern
     end
 
-    def name
-      ::File.basename path
+    def name(with_extention=true)
+      ::File.basename path, (with_extention ? "" : ".#{extention}")
     end
+    
+    def extention
+      ::File.extname(path)[1..-1] # Gets rid of the dot
+    end
+    
   
     def exists?
       ::File.exist? path

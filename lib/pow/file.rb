@@ -25,10 +25,6 @@ module Pow
       ::File.delete(path)
     end
     
-    def extention
-      ::File.extname(path)[1..-1] # Gets rid of the dot
-    end
-
     def empty?
       ::File.size(path) == 0
     end
