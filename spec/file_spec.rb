@@ -106,7 +106,15 @@ describe Pow::File do
     Pow(copy_path).should be_kind_of(Pow::File)
   end
   
-  it "can be moved." do    
+  it "can be copied to nonexistant dirs" do    
+    copy_path = @file.parent / "/new_dir/#{@file.name}.copy"
+    @file.copy_to!(copy_path)
+    
+    File.exists?(copy_path).should be_true
+    Pow(copy_path).should be_kind_of(Pow::File)
+  end
+  
+  it "can be moved" do    
     move_path = @file.path + ".move"
     old_path = @file.path
     @file.move_to(move_path)
@@ -116,6 +124,31 @@ describe Pow::File do
     Pow(move_path).should be_kind_of(Pow::File)
     @file.path.should == move_path
   end
+
+  it "can be moved to nonexistant dirs" do
+    move_path = @file.parent / "/new_dir/#{@file.name}.move"
+    old_path = @file.path
+    @file.move_to!(move_path)
+    
+    File.exists?(move_path).should be_true
+    File.exists?(old_path).should_not be_true
+    Pow(move_path).should be_kind_of(Pow::File)
+    @file.path.should == move_path
+  end
+
+  it "can be renamed" do    
+    new_name = "humpty_dumpty.splat"
+    new_path = @file.parent / new_name
+    old_path = @file.path
+    @file.rename_to(new_name)
+    
+    File.exists?(old_path).should_not be_true
+    File.exists?(new_path).should be_true    
+    Pow(new_path).should be_kind_of(Pow::File)
+    @file.name.should == new_name    
+    @file.path.should == new_path    
+  end
+
   
   it "has a parent dir" do    
     @file.parent.should == @dir

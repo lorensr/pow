@@ -47,10 +47,24 @@ module Pow
     end
     alias_method :cp, :copy_to
     
+    def copy_to!(dest)
+      path_must_exist
+    end
+    alias_method :cp!, :copy_to!
+    
     def move_to(dest)
       path_must_exist
     end
     alias_method :mv, :move_to
+    
+    def move_to!(dest)
+      path_must_exist
+    end
+    alias_method :mv!, :move_to!
+    
+    def rename_to(new_name)
+      move_to(parent / new_name)
+    end
         
     def permissions=(mode)
       mode = mode.to_s.to_i(8) # convert from octal
@@ -66,16 +80,19 @@ module Pow
     end
 
     def accessed_at
-      path.atime
+      ::File.atime(path)
     end
+    alias_method :atime, :accessed_at
 
     def changed_at
-      path.ctime
+      ::File.ctime(path)
     end
+    alias_method :ctime, :changed_at
 
     def modified_at
-      path.mtime
+      ::File.mtime(path)
     end
+    alias_method :mtime, :modified_at
     
     # String representation of the expanded path
     def to_s
@@ -120,7 +137,6 @@ module Pow
     def extention
       ::File.extname(path)[1..-1] # Gets rid of the dot
     end
-    
   
     def exists?
       ::File.exist? path

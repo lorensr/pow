@@ -1,17 +1,15 @@
 module Pow
+  
+  # Pow object representing a directory. Inherits from Pow::Base 
   class Directory < Base
     include Enumerable
 
-  
-    # ====================
-    # = Instance Methods =
-    # ====================
-    def initialize(path, mode=nil, &block)
+    def initialize(path, mode=nil, &block) #:nodoc:
       super
       open(&block) if block_given?
     end
 
-    def open(mode=nil, &block)
+    def open(mode=nil, &block) #:nodoc:
       raise PowError, "'#{path}' does not exist!" unless exists?
       
       begin
@@ -23,15 +21,17 @@ module Pow
       end
     end
     
-    def create(&block)
+    def create(&block) #:nodoc:
       create_directory(&block)
     end
 
+    # Deletes an empty directory
     def delete
       raise PowError, "Can not delete '#{path}'. It must be empty before you delete it!" unless children.empty?
       Dir.rmdir path
     end
     
+    # Recurslivly deletes the directory, DANGER! DANGER!
     def delete!
       FileUtils.rm_r path
     end

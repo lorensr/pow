@@ -4,10 +4,10 @@ Pow
 
 == Description:
 
-You can manipulate files and directories in Ruby, but it's not fun -- it's missing POW!
+Manipulating files and directories in Ruby is boring and tedious -- it's missing POW!
 Pow treats files and directories as ruby objects giving you more power and flexibility.
 
-Why not use File, FileUtils, Find, FileTest, Pathname, ...? Because Pow combines the power of those libraries into one rubyish interface. 
+Why not just use File, FileUtils, Find, FileTest, Pathname, etc...? Because Pow combines the power of those libraries into one rubyish interface. 
 
 == Basic Usage
 
@@ -21,7 +21,7 @@ Consider this directory structure
       program
     /extra_dir
 
-Open a directory
+To open a directory
   path = Pow("tmp")
 
 Check out what's inside a directory
@@ -37,9 +37,16 @@ Check out what's inside a directory
   /tmp/sub_dir/program - Pow::File
   /tmp/extra_dir - Pow::Directory
   
+Access a file in that directory
+  # The / operator accepcts symbols, strings or other Pow objects
+  file = path / :subdir / "file.txt"
+
+  # You can also use brackets to access paths
+  file = path[:subdir, "file.txt"]
+  
 Create nested directories
-  Pow("moar").create do
-    Pow("sub_dir").create
+  Pow("MOAR").create do
+    Pow("sub_dir").create do
       Pow("info.txt").create {|file| file.puts "Here is the info you desired!"}
     end
 
@@ -47,7 +54,7 @@ Create nested directories
   end
   
   # Creates directory structure
-  /moar
+  /MOAR
     /sub_dir
       info.txt
     README
@@ -58,10 +65,25 @@ Open a file
   end
 
 Create a file
-  Pow(:tmp, :sub_dir, :new_file.txt).create do |file|
+  Pow("tmp/sub_dir/new_file.txt").create do |file|
     # All the stuff you usually do with an new file!
   end
-
+  
+Do you hate having to write <b>require File.expand_path(File.dirname(__FILE__) + "/lib/something_else")</b> all the time, instead try this
+  # The Pow! method will automatically create a path based on the current files parent
+  require Pow!("lib/something_else")
+  # Instead of 
+  require File.expand_path(File.dirname(__FILE__) + "/lib/something_else")
+  
+Other things you can do (read more about them in the docs)
+  - Directories that actually use Enumerable!
+  - Move files/directores
+  - Copy files/directories
+  - Get/set permissions
+  - Delete and recursive deletes
+  - Combining paths with the / operator
+  - And much much more!
+  
 == Installation:
   
   $ sudo gem install pow
@@ -82,11 +104,11 @@ Create a file
 
 == Special Thanks:
 
-* Your name could be here! Think about the fame and notoriety you could obtain!
+* Chris Shea http://ruby.tie-rack.org/
 
 == License:
 
-Copyright (c) 2007 Ryan Davis and the rest of the Ruby Hit Squad
+Copyright (c) 2007 Corey Johnson and the rest of the Ruby Hit Squad
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
