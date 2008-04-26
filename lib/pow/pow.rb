@@ -1,9 +1,11 @@
 class PowError < StandardError; end
 
+# Used to create a Pow object based in the current working directory
 def Pow(*args, &block)
   Pow::Base.open(*args, &block)
 end
 
+# Used to create a Pow object based in the current files directory
 def Pow!(*args, &block)
   file_path = ::File.dirname(caller[0])
   Pow(file_path, *args, &block)
@@ -13,7 +15,7 @@ module Pow
   class Base
     attr_accessor :path
 
-    def self.open(*paths, &block)
+    def self.open(*paths, &block) #:nodoc:
       paths.collect! {|path| path.to_s}
       path = ::File.join(paths)
   
@@ -101,19 +103,20 @@ module Pow
     alias_method :to_str, :to_s
     
     # Shortcut to combine paths
-    #   path = Pow("tmp")
-    #   readme_path = path[:README]
+    #   tmp = Pow("tmp")
+    #   readme_path = tmp["subdir", :README]
     def [](*paths, &block)
       Pow(path, *paths, &block)
     end
 
     # Shortcut to append info onto a Pow object
-    #   path = Pow("tmp")
-    #   readme_path = path/"subdir"/"README"
+    #   tmp = Pow("tmp")
+    #   readme_path = tmp/"subdir"/"README"
     def /(name=nil)
       self.class.open(path, name)
     end
   
+    # Compares the path string
     def ==(other)
       other.to_s == self.to_s
     end
@@ -123,26 +126,32 @@ module Pow
     end
 
     # Regex match on the basename for the path
-    # path = Pow("/tmp/a_file.txt")
-    # path =~ /file/ #=> 2
-    # path =~ /tmp/ #=> nil
+    #   path = Pow("/tmp/a_file.txt")
+    #   path =~ /file/ #=> 2
+    #   path =~ /tmp/ #=> nil
     def =~(pattern)
       name =~ pattern
     end
 
+    # Returns the last component of the filename given, can optionally exclude the extention
+    #
+    # ==== Parameters
+    # with_extention<Boolean>
     def name(with_extention=true)
       ::File.basename path, (with_extention ? "" : ".#{extention}")
     end
     
+    # Returns the extension (the portion of file name in path after the period).
     def extention
       ::File.extname(path)[1..-1] # Gets rid of the dot
     end
-  
+    
     def exists?
       ::File.exist? path
     end
     alias_method :exist?, :exists?
   
+    # Returns the path the is one level up from the current path
     def parent
       Pow(::File.dirname(path))
     end
@@ -151,7 +160,8 @@ module Pow
       true
     end
 
-    #If there is a . in the name, then assume it is a file
+    # Creates a new path. If there is a . in the name, then assume it is a file
+    # Block returns a file object when a file is created
     def create(&block)
       name =~ /\./ ? create_file(&block) : create_directory(&block)
     end

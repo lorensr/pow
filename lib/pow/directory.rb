@@ -55,19 +55,27 @@ module Pow
     # ===============
     # = My Children =
     # ===============
+    
+    # A wrapper for Dir.glob, returns files & directories found by expanding pattern.
     def glob(pattern, *flags)
       Dir[::File.join(to_s, pattern), *flags].collect {|path| Pow(path)}
     end
     
+    # Returns all the files in the directory
     def files
       children(:no_dirs => true)
     end
 
+    # Returns all the directories in the directory
     def directories
       children(:no_files => true)
     end
     alias_method :dirs, :directories
-  
+
+    # Returns all files and directories in the directory. 
+    #
+    # ==== Parameters
+    # options<Hash>:: [:no_dirs, :no_files] (defaults to :no_dirs => true, :no_files => true)
     def children(options={})
       options = {:no_dirs => false, :no_files => false}.merge(options)
 
@@ -84,7 +92,8 @@ module Pow
       
       children
     end
-  
+
+    # Yields the child paths to an each block.
     def each(&block)
       raise PowError, "'#{path.realpath}' does not exist!" unless exists?
       children.each(&block)

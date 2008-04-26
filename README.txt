@@ -1,4 +1,4 @@
-Pow
+== Pow
   by Corey Johnson
   http://github.com/probablycorey/pow/tree/master
 
@@ -45,6 +45,8 @@ Access a file in that directory
   file = path[:subdir, "file.txt"]
   
 Create nested directories
+  # When you create a directory, the block will change the current working directory to the newly created directory 
+
   Pow("MOAR").create do
     Pow("sub_dir").create do
       Pow("info.txt").create {|file| file.puts "Here is the info you desired!"}
@@ -92,7 +94,7 @@ Other things you can do (read more about them in the docs)
 
   1.) Pow is fun to say.
   2.) Pow is easy to type.
-  3.) Because it knocks you on your ass.
+  3.) It knocks you on your ass.
 
 == Requirements:
 
