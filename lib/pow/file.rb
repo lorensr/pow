@@ -14,11 +14,15 @@ module Pow
     def create(&block) #:nodoc:
       create_file(&block)
     end 
-    
+        
     # Opens the file, optionally seeks to the given offset, then returns length bytes (defaulting to the rest of the file). read ensures the file is closed before returning.
     # Alias for IO.read
     def read(length=nil, offset=nil)
       ::File.read(path.to_s, length, offset)
+    end
+    
+    def write(string)
+      open("w") {|f| f.write string}
     end
     
     def delete

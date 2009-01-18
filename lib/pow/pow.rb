@@ -132,6 +132,11 @@ module Pow
     def =~(pattern)
       name =~ pattern
     end
+    
+    # Sort based on name
+    def <=>(other)
+      name <=> other
+    end    
 
     # Returns the last component of the filename given, can optionally exclude the extention
     #
@@ -150,6 +155,16 @@ module Pow
       ::File.exist? path
     end
     alias_method :exist?, :exists?
+  
+    def directory?
+      ::File.directory?(path)
+    end
+    alias_method :is_directory?, :directory?
+    
+    def file?
+      ::File.file?(path)
+    end
+    alias_method :is_file?, :file?
   
     # Returns the path the is one level up from the current path
     def parent

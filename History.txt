@@ -1,3 +1,7 @@
+== 0.2.1 2008-04-28
+
+* Way too much stuff to mention, just read the README
+
 == 0.0.1 2007-10-08
 
 * 1 major enhancement:
