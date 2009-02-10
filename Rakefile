@@ -1,4 +1,8 @@
-require 'config/requirements'
-require 'config/hoe' # setup Hoe + all gem configuration
+require 'rubygems'
+require 'hoe'
+require './lib/pow.rb'
 
-Dir['tasks/**/*.rake'].each { |rake| load rake }
+Hoe.new('pow', Power::VERSION) do |p|
+  p.rubyforge_name = 'pow' # if different than lowercase project name
+  p.developer('proabablycorey', 'probablycorey@gmail.com')
+end
