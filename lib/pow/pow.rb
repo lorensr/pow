@@ -138,16 +138,16 @@ module Pow
       name <=> other
     end    
 
-    # Returns the last component of the filename given, can optionally exclude the extention
+    # Returns the last component of the filename given, can optionally exclude the extension
     #
     # ==== Parameters
-    # with_extention<Boolean>
-    def name(with_extention=true)
-      ::File.basename path, (with_extention ? "" : ".#{extention}")
+    # with_extension<Boolean>
+    def name(with_extension=true)
+      ::File.basename path, (with_extension ? "" : ".#{extension}")
     end
     
     # Returns the extension (the portion of file name in path after the period).
-    def extention
+    def extension
       ::File.extname(path)[1..-1] # Gets rid of the dot
     end
     

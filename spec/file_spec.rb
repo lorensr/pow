@@ -26,15 +26,15 @@ describe Pow::File do
     @file.name.should == "file.txt"
   end
   
-  it "gets name without extention" do    
+  it "gets name without extension" do    
     @file.name(false).should == "file"
   end
 
-  it "gets name without extention, even when there is no extention" do    
+  it "gets name without extension, even when there is no extension" do    
     Pow("./this/word").name(false).should == "word"
   end  
 
-  it "matches regular expression for extention" do    
+  it "matches regular expression for extension" do    
     @file.name.should =~ /txt/
   end
 
@@ -43,14 +43,14 @@ describe Pow::File do
   end
 
   it "has correct extension" do    
-    @file.extention.should == "txt"
+    @file.extension.should == "txt"
   end
 
   it "returns nil if there is no extension" do
     open("#{@dir_pathname}/README", "w+") {|f| f.write "readme"}
     extensionless_file = Pow("#{@dir_pathname}/README")
     
-    extensionless_file.extention.should == nil
+    extensionless_file.extension.should == nil
   end
 
   it "is aware of its existence" do    
