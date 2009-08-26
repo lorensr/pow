@@ -9,10 +9,16 @@ describe Pow::Base, "object creation" do
     
     @file_pathname = "./test_dir/file"
     open(@file_pathname, "w+")
+    
+    @home_dir = File.expand_path("~/")
+    @home_filename = "you_scream.i_scream.for.specs.txt"  
+    @home_file_path = File.join( @home_dir, @home_filename )
+    open( @home_file_path , "w+") {|f| f.write "hello."}
   end 
   
   after do
     FileUtils.rmtree @dir_pathname
+    FileUtils.rm @home_file_path
   end
   
   it "opens an exsiting directory as a Pow::Directory" do
@@ -22,6 +28,13 @@ describe Pow::Base, "object creation" do
     path.to_s.should == File.expand_path(@dir_pathname)  
   end
   
+  it "opens ~ directory as a Pow::Directory" do
+    path = Pow::Base.open('~')
+    path.should be_instance_of(Pow::Directory)
+    
+    path.to_s.should == File.expand_path('~')  
+  end  
+  
   it "opens an exsiting file as a File" do
     path = Pow::Base.open(@file_pathname)
     path.should be_instance_of(Pow::File)
@@ -29,8 +42,20 @@ describe Pow::Base, "object creation" do
     path.to_s.should == File.expand_path(@file_pathname)    
   end
   
+  it "opens an exsiting file in ~/ as a File with Pow method" do
+    path = Pow::Base.open( '~', @home_filename)
+    path.should be_instance_of(Pow::File)
+    
+    path.to_s.should == File.expand_path(File.join('~',@home_filename))
+  end  
+  
   it "opens an non-exsiting path as a Pow" do
     path = Pow::Base.open("./blah/blah/blah/blah")
+    path.should be_instance_of(Pow::Base)
+  end
+
+  it "opens an non-exsiting path under ~/ as a Pow" do
+    path = Pow::Base.open("~/blah.blah.pow.pow")
     path.should be_instance_of(Pow::Base)
   end
 
@@ -40,7 +65,19 @@ describe Pow::Base, "object creation" do
     
     path.to_s.should == File.expand_path(@dir_pathname)    
   end
+
+  it "expands and opens ~ path with Pow method" do
+    path = Pow('~')
+    path.should be_instance_of(Pow::Directory)
+    
+    path.to_s.should == File.expand_path('~') 
+  end
   
+  it "expands and opens ~/ directory with Pow method" do
+    dir = Pow('~/')
+    dir.should be_instance_of(Pow::Directory)
+  end
+      
   it "opens using string with Pow::Base.open." do    
     path = Pow(@dir_pathname.to_s)
     path.should be_kind_of(Pow::Directory)
