@@ -8,14 +8,14 @@ require 'fileutils'
 require File.dirname(__FILE__) + '/../lib/pow'
 
 describe "A Directory object" do
-  setup do
+  before do
     FileUtils.mkpath "./test_dir/sub_dir"
     
     @dir = Pow("./test_dir")
     @sub_dir = @dir/"sub_dir"
   end 
   
-  teardown do
+  after do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
 
@@ -85,7 +85,7 @@ describe "A Directory object" do
 end
 
 describe "The children of a Directory" do
-  setup do
+  before do
     FileUtils.mkpath "./earth/people"
     FileUtils.mkpath "./earth/places"
     FileUtils.mkpath "./earth/things"
@@ -95,7 +95,7 @@ describe "The children of a Directory" do
     @dir = Pow("./earth/")
   end
   
-  teardown do
+  after do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
   
@@ -136,14 +136,14 @@ describe "The children of a Directory" do
 end
   
 describe "Enumerable parts of Directory" do
-  setup do
+  before do
     FileUtils.mkpath "./test_dir/sub_dir"
     
     @dir = Pow("./test_dir")
     @sub_dir = @dir/"sub_dir"
   end 
   
-  teardown do
+  after do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
   
@@ -167,12 +167,12 @@ describe "Enumerable parts of Directory" do
 end
 
 describe "Using blocks to create Directory structure" do
-  setup do
+  before do
     FileUtils.mkpath "./test_dir/"
     @dir = Pow("./test_dir")
   end
   
-  teardown do
+  after do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
   

@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'pow'
 
 describe Pow::Base, "object creation" do
-  setup do
+  before do
     @dir_pathname = "./test_dir"
     FileUtils.mkdir(@dir_pathname)
     
@@ -11,7 +11,7 @@ describe Pow::Base, "object creation" do
     open(@file_pathname, "w+")
   end 
   
-  teardown do
+  after do
     FileUtils.rmtree @dir_pathname
   end
   
@@ -71,7 +71,7 @@ describe Pow::Base, "object creation" do
 end
 
 describe Pow::Base, "object equality" do
-  setup do
+  before do
     @path = "./blah1/blah2/blah3/blah4"
     @pow = Pow::Base.open(@path)
   end 
@@ -86,7 +86,7 @@ describe Pow::Base, "object equality" do
 end
 
 describe Pow::Base, "nonexistent paths" do
-  setup do
+  before do
     @pow = Pow::Base.open("./blah/blah/blah/blah")
   end 
   
@@ -100,12 +100,12 @@ describe Pow::Base, "nonexistent paths" do
 end
 
 describe Pow::Base, "creation" do
-  setup do
+  before do
     FileUtils.mkpath "./test_dir/"
     @dir = Pow("./test_dir").create
   end
   
-  teardown do
+  after do
     FileUtils.rm_r @dir.to_s if FileTest.exist?(@dir.to_s)
   end
   

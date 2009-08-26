@@ -8,7 +8,7 @@ require 'spec'
 require File.dirname(__FILE__) + '/../lib/pow'
 
 describe Pow::File do
-  setup do
+  before do
     @dir_pathname = "./test_dir"
     @filename = "file.txt"  
     FileUtils.mkpath @dir_pathname
@@ -18,7 +18,7 @@ describe Pow::File do
     @file = Pow("#{@dir_pathname}/#{@filename}")
   end 
   
-  teardown do
+  after do
     FileUtils.rm_r @dir_pathname
   end
 
