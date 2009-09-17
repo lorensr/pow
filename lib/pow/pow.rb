@@ -17,21 +17,15 @@ module Pow
 
     def self.open(*paths, &block) #:nodoc:
       paths.collect! {|path| path.to_s}
-      
-      raw_path = ::File.join(paths)
-      expanded_path = ::File.expand_path(raw_path)
-      klass = nil
-      
-      path = [raw_path, expanded_path].detect { |loc|
-          klass = if ::File.directory?(loc)
-            Directory
-          elsif ::File.file?(loc)
-            File
-          end
-      } 
-      
-      path ||= raw_path
-      klass ||= self
+      path = ::File.join(paths)
+  
+      klass = if ::File.directory?(path)
+        Directory
+      elsif ::File.file?(path)
+        File
+      else
+        self
+      end
   
       klass.new(path, &block)
     end
@@ -50,6 +44,10 @@ module Pow
       path_must_exist
     end
     
+    def write(string)
+      create_file.write(string)
+    end
+        
     def copy_to(dest)
       path_must_exist
     end

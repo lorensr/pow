@@ -1,1 +1,4 @@
-Make recursive permisions
+[ ] Make recursive permisions
+[ ] Make copy/move take multiple arguments, not just POW objects
+[ ] Pow objects should figure out if they are a file or directory on each call
+[ ] Path.name should take extension as an optional parameter
