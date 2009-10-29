@@ -40,6 +40,12 @@ module Pow
       FileUtils.cp_r(path, dest.to_s)
     end
     alias_method :cp, :copy_to
+
+    def copy_to!(dest)
+      Pow(dest).parent.create_directory
+      FileUtils.cp_r(path, dest.to_s)
+    end
+    alias_method :cp!, :copy_to!
     
     def move_to(dest)
       if FileUtils.mv(path.to_s, dest.to_s)
