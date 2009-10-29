@@ -1,11 +1,11 @@
 class PowError < StandardError; end
 
-# Used to create a Pow object based in the current working directory
+# Path based in current working directory
 def Pow(*args, &block)
   Pow::Base.open(*args, &block)
 end
 
-# Used to create a Pow object based in the current files directory
+# Path based in the current file's directory
 def Pow!(*args, &block)
   file_path = ::File.dirname(caller[0])
   Pow(file_path, *args, &block)
@@ -40,8 +40,8 @@ module Pow
       self.path = ::File.expand_path(path)
     end
 
-    def open(mode=nil, &block)
-      path_must_exist
+    def open(mode="r", &block)
+      create(mode, &block)
     end
     
     def write(string)
@@ -181,14 +181,14 @@ module Pow
 
     # Creates a new path. If there is a . in the name, then assume it is a file
     # Block returns a file object when a file is created
-    def create(&block)
-      name =~ /\./ ? create_file(&block) : create_directory(&block)
+    def create(mode="r", &block)
+      name =~ /\./ ? create_file(mode, &block) : create_directory(&block)
     end
   
-    def create_file(&block)
+    def create_file(mode="r", &block)
       FileUtils.mkdir_p(::File.dirname(self.to_s))
       file = File.new(self.to_s)
-      file.open("w+", &block) # Create the file
+      file.open(mode, &block) # Create the file
     
       file
     end
