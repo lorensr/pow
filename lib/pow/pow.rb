@@ -181,11 +181,11 @@ module Pow
 
     # Creates a new path. If there is a . in the name, then assume it is a file
     # Block returns a file object when a file is created
-    def create(mode="r", &block)
+    def create(mode="a+", &block)
       name =~ /\./ ? create_file(mode, &block) : create_directory(&block)
     end
   
-    def create_file(mode="r", &block)
+    def create_file(mode="a+", &block)
       FileUtils.mkdir_p(::File.dirname(self.to_s))
       file = File.new(self.to_s)
       file.open(mode, &block) # Create the file
