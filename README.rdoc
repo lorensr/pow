@@ -31,18 +31,18 @@ Check out what's inside a directory
   # Output!
   # -------
   /tmp/README - Pow::File
-  /tmp/subdir - Pow::Directory
+  /tmp/sub_dir - Pow::Directory
   /tmp/sub_dir/deeper_dir - Pow::Directory
   /tmp/sub_dir/file.txt - Pow::File
   /tmp/sub_dir/program - Pow::File
   /tmp/extra_dir - Pow::Directory
   
 Access a file in that directory
-  # The / operator accepcts symbols, strings or other Pow objects
-  file = path / :subdir / "file.txt"
+  # The / operator accepts symbols, strings or other Pow objects
+  file = path / :sub_dir / "file.txt"
 
   # You can also use brackets to access paths
-  file = path[:subdir, "file.txt"]
+  file = path[:sub_dir, "file.txt"]
   
 Create nested directories
   # When you create a directory, the block will change the current working directory to the newly created directory 
@@ -71,7 +71,7 @@ Create a file
     # All the stuff you usually do with an new file!
   end
   
-Do you hate having to write <b>require File.expand_path(File.dirname(__FILE__) + "/lib/something_else")</b> all the time, instead try this
+If you hate having to write <b>require File.expand_path(File.dirname(__FILE__) + "/lib/something_else")</b> all the time, instead try this
   # The Pow! method will automatically create a path based on the current files parent
   require Pow!("lib/something_else")
   # Instead of 
